@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <RootNamespace>AudIOQP</RootNamespace>
+    <AssemblyName>AudIOQP</AssemblyName>
+    <Version>1.0.0</Version>
+    <Product>AudIOQP</Product>
+    <Description>Windows tray app that switches the default audio output device.</Description>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+  </PropertyGroup>
+</Project>
