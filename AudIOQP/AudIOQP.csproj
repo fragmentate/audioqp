@@ -14,10 +14,11 @@
     <Description>Windows tray app that switches the default audio output device.</Description>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- Local builds bump PATCH. Pass -p:IncrementPatchVersion=false for a release so the committed version ships unchanged. -->
+    <IncrementPatchVersion Condition="'$(IncrementPatchVersion)' == ''">true</IncrementPatchVersion>
   </PropertyGroup>
 
-  <!-- Bump PATCH before assembly info is generated so this build uses the new version. -->
-  <Target Name="IncrementPatchVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
+  <Target Name="IncrementPatchVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true' AND '$(IncrementPatchVersion)' == 'true'">
     <Exec Command="python &quot;$(UserProfile)\bin\csproj-version.py&quot; &quot;$(MSBuildProjectFullPath)&quot;" />
     <XmlPeek XmlInputPath="$(MSBuildProjectFullPath)" Query="/Project/PropertyGroup/Version/text()">
       <Output TaskParameter="Result" PropertyName="Version" />
