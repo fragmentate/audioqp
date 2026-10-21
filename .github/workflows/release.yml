@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish Windows x64
+    runs-on: windows-latest
+    steps:
+      - name: Check out the tag
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Require the tag to match the project version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ($tag -notmatch '^v(?<version>\d+\.\d+\.\d+)$') {
+            Write-Error "Tag '$tag' is not a vMAJOR.MINOR.PATCH version."
+            exit 1
+          }
+          $version = $Matches.version
+          $projectVersion = (Select-Xml -Path "AudIOQP/AudIOQP.csproj" -XPath "/Project/PropertyGroup/Version").Node.InnerText.Trim()
+          if ($projectVersion -ne $version) {
+            Write-Error "Tag v$version does not match <Version>$projectVersion</Version>."
+            exit 1
+          }
+          "VERSION=$version" | Add-Content -Path $env:GITHUB_ENV -Encoding ascii
+
+      - name: Publish the self-contained app
+        shell: pwsh
+        run: >
+          dotnet publish AudIOQP/AudIOQP.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:IncrementPatchVersion=false
+          -p:DebugType=none
+          -p:DebugSymbols=false
+          -o artifacts/publish
+
+      - name: Zip the publish folder
+        shell: pwsh
+        run: |
+          Get-ChildItem artifacts/publish -Recurse -Filter *.pdb | Remove-Item -Force
+          $zipName = "AudIOQP-$env:VERSION-win-x64.zip"
+          $zipPath = Join-Path (Get-Location) $zipName
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(
+            (Resolve-Path "artifacts/publish"),
+            $zipPath,
+            [System.IO.Compression.CompressionLevel]::Optimal,
+            $false)
+          "ZIP_NAME=$zipName" | Add-Content -Path $env:GITHUB_ENV -Encoding ascii
+
+      - name: Publish the GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "v$env:VERSION" $env:ZIP_NAME --title "AudIOQP $env:VERSION" --generate-notes
