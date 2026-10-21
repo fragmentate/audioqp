@@ -9,10 +9,18 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <RootNamespace>AudIOQP</RootNamespace>
     <AssemblyName>AudIOQP</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>0.0.1</Version>
     <Product>AudIOQP</Product>
     <Description>Windows tray app that switches the default audio output device.</Description>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <!-- Bump PATCH before assembly info is generated so this build uses the new version. -->
+  <Target Name="IncrementPatchVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="python &quot;$(UserProfile)\bin\csproj-version.py&quot; &quot;$(MSBuildProjectFullPath)&quot;" />
+    <XmlPeek XmlInputPath="$(MSBuildProjectFullPath)" Query="/Project/PropertyGroup/Version/text()">
+      <Output TaskParameter="Result" PropertyName="Version" />
+    </XmlPeek>
+  </Target>
 </Project>
