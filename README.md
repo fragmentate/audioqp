@@ -3,6 +3,7 @@
 AudIOQP is a Windows tray application that switches the default audio playback device. It stays running so you can change the output with a global shortcut, from a device list, or from the tray menu.
 
 It switches playback devices only. It does not route audio for individual applications, and it does not change recording devices.
+<img width="542" height="692" alt="image" src="https://github.com/user-attachments/assets/60202da8-f7ac-4e65-b2dd-0ecf4bd6b265" />
 
 ## Requirements
 
